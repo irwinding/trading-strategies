@@ -55,3 +55,29 @@ def test_zero_volatility_returns_nan():
 def test_accepts_pandas_series():
     s = pd.Series([0.10, -0.10, 0.10])
     np.testing.assert_allclose(sharpe_ratio(s, annual_rf=0.0), 0.2886751, rtol=1e-5)
+
+
+def test_periods_per_year_changes_rf_conversion():
+    # With periods_per_year=252 the annual rf must be de-compounded to a DAILY
+    # rate, not a monthly one.
+    returns = [0.001, -0.001, 0.001]
+    daily_rf = 1.05 ** (1 / 252) - 1
+    mean, std = np.mean(returns), np.std(returns, ddof=1)
+    np.testing.assert_allclose(
+        sharpe_ratio(returns, annual_rf=0.05, periods_per_year=252),
+        (mean - daily_rf) / std,
+        rtol=1e-9,
+    )
+
+
+def test_annualize_scales_by_sqrt_periods():
+    returns = [0.001, -0.001, 0.001]
+    per_period = sharpe_ratio(returns, annual_rf=0.0, periods_per_year=252)
+    annualized = sharpe_ratio(returns, annual_rf=0.0, periods_per_year=252, annualize=True)
+    np.testing.assert_allclose(annualized, per_period * math.sqrt(252), rtol=1e-9)
+
+
+def test_defaults_unchanged_monthly_not_annualized():
+    # Default call must still be the monthly, NON-annualized Sharpe.
+    returns = [0.10, -0.10, 0.10]
+    np.testing.assert_allclose(sharpe_ratio(returns, annual_rf=0.0), 0.2886751, rtol=1e-5)
