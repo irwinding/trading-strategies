@@ -5,34 +5,19 @@
 where R_f^monthly is derived from an annualised risk-free rate:
     R_f^monthly = (1 + annual_rf) ** (1/12) - 1
 
-The default risk-free rate is the US 3-month T-bill yield (^IRX via yfinance).
+The default risk-free rate is the US 3-month T-bill yield (^IRX via yfinance),
+fetched via utils.fetch_risk_free_rate.
 Returns are assumed to be at monthly frequency when converting the annual rate.
 """
 
 from __future__ import annotations
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import pandas as pd
-import yfinance as yf
-
-
-def fetch_risk_free_rate(as_of_date: str | None = None) -> float:
-    """Return the annualised US 3-month T-bill yield (decimal, not percent).
-
-    Parameters
-    ----------
-    as_of_date:
-        ISO date string (e.g. '2024-12-31'). Fetches the yield on or just
-        before this date. Defaults to the most recent available value.
-    """
-    anchor = pd.Timestamp(as_of_date) if as_of_date else pd.Timestamp.today()
-    start = (anchor - pd.DateOffset(days=7)).strftime("%Y-%m-%d")
-    end = anchor.strftime("%Y-%m-%d")
-
-    data = yf.download("^IRX", start=start, end=end, progress=False, multi_level_index=False)
-    if data.empty:
-        raise ValueError(f"Could not fetch ^IRX data around {as_of_date or 'today'}.")
-    # ^IRX is quoted in percent (e.g. 5.25 means 5.25%)
-    return float(data["Close"].dropna().iloc[-1]) / 100
+from utils import fetch_risk_free_rate  # noqa: F401 – re-exported for convenience
 
 
 def sharpe_ratio(
