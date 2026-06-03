@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pandas as pd
-from utils import fetch_risk_free_rate  # noqa: F401 – re-exported for convenience
+from utils import fetch_risk_free_rate
 
 
 def sharpe_ratio(

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sharpe import sharpe_ratio, fetch_risk_free_rate
+from sharpe import sharpe_ratio
 
 
 def test_explicit_zero_rf():
