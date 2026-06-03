@@ -12,12 +12,8 @@ Returns are assumed to be at monthly frequency when converting the annual rate.
 
 from __future__ import annotations
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 import pandas as pd
-from utils import fetch_risk_free_rate
+from .utils import fetch_risk_free_rate
 
 
 def sharpe_ratio(

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sharpe import sharpe_ratio
+from common.sharpe import sharpe_ratio
 
 
 def test_explicit_zero_rf():
@@ -30,7 +30,7 @@ def test_rf_conversion_is_monthly_compounding():
 
 def test_default_rf_fetches_tbill():
     returns = [0.10, -0.10, 0.10]
-    with patch("sharpe.fetch_risk_free_rate", return_value=0.05) as mock_fetch:
+    with patch("common.sharpe.fetch_risk_free_rate", return_value=0.05) as mock_fetch:
         result = sharpe_ratio(returns)
     mock_fetch.assert_called_once_with(as_of_date=None)
     monthly_rf = 1.05 ** (1 / 12) - 1
@@ -42,7 +42,7 @@ def test_default_rf_uses_series_end_date():
     # A DatetimeIndex Series: the last date should be passed to fetch_risk_free_rate.
     idx = pd.date_range("2024-01-31", periods=3, freq="ME")
     returns = pd.Series([0.10, -0.10, 0.10], index=idx)
-    with patch("sharpe.fetch_risk_free_rate", return_value=0.04) as mock_fetch:
+    with patch("common.sharpe.fetch_risk_free_rate", return_value=0.04) as mock_fetch:
         sharpe_ratio(returns)
     mock_fetch.assert_called_once_with(as_of_date="2024-03-31")
 
